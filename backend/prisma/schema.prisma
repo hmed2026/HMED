@@ -1,0 +1,437 @@
+// H MED DISTRIBUIDORA - Schema do Banco de Dados
+// PostgreSQL + Prisma ORM
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// USUÁRIOS E AUTENTICAÇÃO
+// ==========================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String
+  avatar        String?
+  role          UserRole  @default(OPERATOR)
+  isActive      Boolean   @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  company       Company?  @relation(fields: [companyId], references: [id])
+  companyId     String?
+
+  transactions  Transaction[]
+  sales         Sale[]
+  auditLogs     AuditLog[]
+  notifications Notification[]
+  savedFilters  SavedFilter[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  MANAGER
+  OPERATOR
+  VIEWER
+}
+
+// ==========================================
+// EMPRESA
+// ==========================================
+
+model Company {
+  id          String   @id @default(cuid())
+  name        String
+  tradeName   String?
+  document    String?  @unique
+  email       String?
+  phone       String?
+  address     String?
+  city        String?
+  state       String?
+  zipCode     String?
+  logoUrl     String?
+  website     String?
+  isActive    Boolean  @default(true)
+  settings    Json?    @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users        User[]
+  clients      Client[]
+  products     Product[]
+  transactions Transaction[]
+  sales        Sale[]
+  categories   Category[]
+  goals        Goal[]
+
+  @@map("companies")
+}
+
+// ==========================================
+// CLIENTES
+// ==========================================
+
+model Client {
+  id           String   @id @default(cuid())
+  name         String
+  email        String?
+  phone        String?
+  document     String?
+  type         ClientType @default(INDIVIDUAL)
+  address      String?
+  city         String?
+  state        String?
+  zipCode      String?
+  notes        String?
+  isActive     Boolean  @default(true)
+  totalPurchases Float  @default(0)
+  lastPurchaseAt DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime?
+
+  company      Company  @relation(fields: [companyId], references: [id])
+  companyId    String
+
+  sales        Sale[]
+  transactions Transaction[]
+
+  @@map("clients")
+}
+
+enum ClientType {
+  INDIVIDUAL
+  COMPANY
+  HOSPITAL
+  CLINIC
+  PHARMACY
+  DISTRIBUTOR
+  OTHER
+}
+
+// ==========================================
+// PRODUTOS / ESTOQUE
+// ==========================================
+
+model Product {
+  id           String   @id @default(cuid())
+  name         String
+  code         String?
+  description  String?
+  category     String?
+  unit         String?  @default("UN")
+  costPrice    Float    @default(0)
+  salePrice    Float    @default(0)
+  stock        Float    @default(0)
+  minStock     Float    @default(0)
+  imageUrl     String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime?
+
+  company      Company  @relation(fields: [companyId], references: [id])
+  companyId    String
+
+  saleItems    SaleItem[]
+
+  @@map("products")
+}
+
+// ==========================================
+// CATEGORIAS FINANCEIRAS
+// ==========================================
+
+model Category {
+  id          String          @id @default(cuid())
+  name        String
+  type        CategoryType
+  color       String?         @default("#3B82F6")
+  icon        String?
+  description String?
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  company     Company         @relation(fields: [companyId], references: [id])
+  companyId   String
+
+  transactions Transaction[]
+
+  @@map("categories")
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+// ==========================================
+// MOVIMENTAÇÕES FINANCEIRAS
+// ==========================================
+
+model Transaction {
+  id           String            @id @default(cuid())
+  type         TransactionType
+  status       TransactionStatus @default(PENDING)
+  description  String
+  amount       Float
+  dueDate      DateTime
+  paidAt       DateTime?
+  paymentMethod PaymentMethod?
+  notes        String?
+  reference    String?
+  attachment   String?
+  isRecurring  Boolean          @default(false)
+  recurringId  String?
+  importBatch  String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  deletedAt    DateTime?
+
+  company      Company          @relation(fields: [companyId], references: [id])
+  companyId    String
+
+  category     Category?        @relation(fields: [categoryId], references: [id])
+  categoryId   String?
+
+  client       Client?          @relation(fields: [clientId], references: [id])
+  clientId     String?
+
+  createdBy    User             @relation(fields: [userId], references: [id])
+  userId       String
+
+  @@map("transactions")
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+enum TransactionStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+  PARTIAL
+}
+
+enum PaymentMethod {
+  CASH
+  PIX
+  CREDIT_CARD
+  DEBIT_CARD
+  BANK_TRANSFER
+  BOLETO
+  CHECK
+  OTHER
+}
+
+// ==========================================
+// VENDAS
+// ==========================================
+
+model Sale {
+  id           String      @id @default(cuid())
+  number       Int
+  status       SaleStatus  @default(PENDING)
+  subtotal     Float
+  discount     Float       @default(0)
+  total        Float
+  paymentMethod PaymentMethod?
+  notes        String?
+  importBatch  String?
+  soldAt       DateTime    @default(now())
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  deletedAt    DateTime?
+
+  company      Company     @relation(fields: [companyId], references: [id])
+  companyId    String
+
+  client       Client?     @relation(fields: [clientId], references: [id])
+  clientId     String?
+
+  seller       User        @relation(fields: [userId], references: [id])
+  userId       String
+
+  items        SaleItem[]
+
+  @@map("sales")
+}
+
+model SaleItem {
+  id         String   @id @default(cuid())
+  quantity   Float
+  unitPrice  Float
+  discount   Float    @default(0)
+  total      Float
+  createdAt  DateTime @default(now())
+
+  sale       Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  saleId     String
+
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  String
+
+  @@map("sale_items")
+}
+
+enum SaleStatus {
+  PENDING
+  CONFIRMED
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
+// ==========================================
+// METAS FINANCEIRAS
+// ==========================================
+
+model Goal {
+  id          String     @id @default(cuid())
+  name        String
+  type        GoalType
+  targetValue Float
+  currentValue Float     @default(0)
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  company     Company    @relation(fields: [companyId], references: [id])
+  companyId   String
+
+  @@map("goals")
+}
+
+enum GoalType {
+  REVENUE
+  EXPENSE
+  PROFIT
+  SALES_COUNT
+  NEW_CLIENTS
+}
+
+// ==========================================
+// IMPORTAÇÕES
+// ==========================================
+
+model ImportBatch {
+  id           String       @id @default(cuid())
+  filename     String
+  originalName String
+  type         ImportType
+  status       ImportStatus @default(PROCESSING)
+  totalRows    Int          @default(0)
+  processedRows Int         @default(0)
+  errorRows    Int          @default(0)
+  errors       Json?
+  summary      Json?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  companyId    String
+  userId       String
+
+  @@map("import_batches")
+}
+
+enum ImportType {
+  TRANSACTIONS
+  SALES
+  CLIENTS
+  PRODUCTS
+  EXTRACT
+}
+
+enum ImportStatus {
+  PROCESSING
+  COMPLETED
+  FAILED
+  PARTIAL
+}
+
+// ==========================================
+// NOTIFICAÇÕES
+// ==========================================
+
+model Notification {
+  id        String           @id @default(cuid())
+  title     String
+  message   String
+  type      NotificationType @default(INFO)
+  isRead    Boolean          @default(false)
+  link      String?
+  createdAt DateTime         @default(now())
+
+  user      User             @relation(fields: [userId], references: [id])
+  userId    String
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  ALERT
+}
+
+// ==========================================
+// LOGS DE AUDITORIA
+// ==========================================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  action     String
+  entity     String
+  entityId   String
+  oldData    Json?
+  newData    Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  companyId  String
+
+  @@map("audit_logs")
+}
+
+// ==========================================
+// FILTROS SALVOS
+// ==========================================
+
+model SavedFilter {
+  id        String   @id @default(cuid())
+  name      String
+  module    String
+  filters   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+
+  @@map("saved_filters")
+}
