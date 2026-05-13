@@ -18,56 +18,55 @@
 
 @layer components {
   .glass-card {
-    @apply bg-dark-800/60 backdrop-blur-md border border-white/[0.06] rounded-2xl shadow-glass;
+    @apply bg-slate-800/60 backdrop-blur-md border border-white/[0.06] rounded-2xl shadow-glass;
   }
   .glass-card-hover {
-    @apply glass-card transition-all duration-300 hover:bg-dark-800/80 hover:border-primary-600/30 hover:shadow-glow;
+    @apply bg-slate-800/60 backdrop-blur-md border border-white/[0.06] rounded-2xl shadow-glass transition-all duration-300;
+  }
+  .glass-card-hover:hover {
+    @apply bg-slate-800/80 border-blue-600/30 shadow-glow;
   }
   .btn-primary {
-    @apply bg-gradient-to-r from-primary-700 to-primary-600 hover:from-primary-600 hover:to-primary-500 text-white font-medium px-4 py-2 rounded-xl transition-all duration-200 shadow-glow hover:shadow-glow-lg active:scale-95 flex items-center gap-2;
+    @apply bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500 text-white font-medium px-4 py-2 rounded-xl transition-all duration-200 shadow-glow active:scale-95 flex items-center gap-2;
   }
   .btn-secondary {
-    @apply bg-dark-700/80 hover:bg-dark-600/80 text-dark-100 border border-white/[0.08] hover:border-primary-500/30 font-medium px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2;
+    @apply bg-slate-700/80 hover:bg-slate-600/80 text-slate-100 border border-white/[0.08] hover:border-blue-500/30 font-medium px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2;
   }
   .btn-danger {
     @apply bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:border-red-500/40 font-medium px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2;
   }
   .input-field {
-    @apply w-full bg-dark-900/80 border border-white/[0.08] focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/30 text-dark-50 placeholder-dark-400 rounded-xl px-4 py-2.5 text-sm transition-all duration-200 outline-none;
+    @apply w-full bg-slate-900/80 border border-white/[0.08] focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30 text-slate-50 placeholder-slate-400 rounded-xl px-4 py-2.5 text-sm transition-all duration-200 outline-none;
   }
   .stat-card {
     @apply glass-card p-6 relative overflow-hidden cursor-default;
   }
-  .stat-card::before {
-    content: '';
-    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
-    background: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.08), transparent 70%);
-  }
-  .stat-card:hover::before {
-    @apply opacity-100;
-  }
   .sidebar-item {
-    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-dark-300 hover:text-dark-50 hover:bg-primary-700/20 transition-all duration-200 cursor-pointer group relative;
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-slate-50 hover:bg-blue-700/20 transition-all duration-200 cursor-pointer relative;
   }
   .sidebar-item.active {
-    @apply bg-primary-700/30 text-white border border-primary-600/30 shadow-glow;
+    @apply bg-blue-700/30 text-white border border-blue-600/30 shadow-glow;
   }
   .badge {
     @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
   }
-  .badge-green { @apply badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20; }
-  .badge-red { @apply badge bg-red-500/10 text-red-400 border border-red-500/20; }
-  .badge-yellow { @apply badge bg-yellow-500/10 text-yellow-400 border border-yellow-500/20; }
-  .badge-blue { @apply badge bg-blue-500/10 text-blue-400 border border-blue-500/20; }
-  .badge-purple { @apply badge bg-purple-500/10 text-purple-400 border border-purple-500/20; }
-  .table-row {
-    @apply border-b border-white/[0.04] hover:bg-primary-700/5 transition-colors duration-150;
+  .badge-green {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
   }
-  .skeleton {
-    @apply bg-dark-700/60 rounded-lg animate-pulse;
-    background: linear-gradient(90deg, rgba(30,41,59,0.6) 25%, rgba(51,65,85,0.6) 50%, rgba(30,41,59,0.6) 75%);
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
+  .badge-red {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20;
+  }
+  .badge-yellow {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-500/10 text-yellow-400 border border-yellow-500/20;
+  }
+  .badge-blue {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20;
+  }
+  .badge-purple {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20;
+  }
+  .table-row {
+    @apply border-b border-white/[0.04] hover:bg-blue-700/5 transition-colors duration-150;
   }
   .page-enter {
     animation: fadeIn 0.3s ease-in-out, slideUp 0.3s ease-out;
@@ -76,10 +75,7 @@
 
 @layer utilities {
   .text-gradient {
-    @apply bg-gradient-to-r from-primary-300 to-blue-400 bg-clip-text text-transparent;
-  }
-  .border-gradient {
-    border-image: linear-gradient(135deg, rgba(59,130,246,0.5), rgba(139,92,246,0.3)) 1;
+    @apply bg-gradient-to-r from-blue-300 to-blue-400 bg-clip-text text-transparent;
   }
   .scrollbar-thin {
     scrollbar-width: thin;
@@ -89,7 +85,15 @@
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }
 
-/* Animação de loading */
+/* Skeleton shimmer */
+.skeleton {
+  background: linear-gradient(90deg, rgba(30,41,59,0.6) 25%, rgba(51,65,85,0.6) 50%, rgba(30,41,59,0.6) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+  border-radius: 0.5rem;
+}
+
+/* Loading bar */
 .loading-bar {
   height: 3px;
   background: linear-gradient(90deg, transparent, #3b82f6, #1d4ed8, transparent);
@@ -99,8 +103,20 @@
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes slideUp {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
 
-/* Gráficos responsivos */
+/* Recharts */
 .recharts-wrapper {
   font-family: 'Inter', sans-serif !important;
 }
@@ -115,8 +131,8 @@
   color: #f8fafc !important;
 }
 
-/* Mobile responsivo */
+/* Mobile */
 @media (max-width: 768px) {
-  .glass-card { @apply rounded-xl; }
-  .stat-card { @apply p-4; }
+  .glass-card { border-radius: 0.75rem; }
+  .stat-card { padding: 1rem; }
 }
