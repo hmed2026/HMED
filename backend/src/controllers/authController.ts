@@ -101,12 +101,12 @@ export const me = async (req: AuthRequest, res: Response) => {
   const user = await prisma.user.findUnique({
     where: { id: req.user!.id },
     include: { company: { select: { id: true, name: true, logoUrl: true, settings: true } } },
-    omit: { password: true } as any,
   });
 
   if (!user) throw new AppError('Usuário não encontrado', 404);
 
-  res.json(user);
+  const { password: _omitPwd, ...userWithoutPassword } = user;
+  res.json(userWithoutPassword);
 };
 
 export const refreshToken = async (req: Request, res: Response) => {

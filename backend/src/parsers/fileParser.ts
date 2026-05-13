@@ -40,7 +40,7 @@ const categoryKeywords: Record<string, string[]> = {
   'Marketing': ['marketing', 'publicidade', 'propaganda', 'anuncio', 'google', 'facebook'],
   'Manutenção': ['manutencao', 'manutenção', 'reparo', 'conserto'],
   'Vendas de Produtos': ['venda', 'receita', 'faturamento', 'pedido', 'nf', 'nota fiscal'],
-];
+};
 
 function detectCategory(description: string): string | undefined {
   const desc = description.toLowerCase();
